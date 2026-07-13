@@ -1,19 +1,41 @@
 import http from 'http';
+import https from 'https';
 
 export default function keepAlive() {
-  const server = http.createServer((req, res) => {
-    // When the server is pinged, return a 200 OK status
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write("Bot Keep-Alive Server is Online!");
-    res.end();
-  });
+    // 1. Create the dummy web server so Render's health check passes
+    const server = http.createServer((req, res) => {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.write("TitanBot is Online and Self-Pinging!");
+        res.end();
+    });
 
-  // Render automatically assigns a port via process.env.PORT
-  const PORT = process.env.PORT || 3000;
-  
-  server.listen(PORT, () => {
-    console.log(`🌐 Keep-alive server is running on port ${PORT}`);
-  }).on('error', (err) => {
-    console.error(`❌ Failed to start keep-alive server. Port might be in use: ${err.message}`);
-  });
+    const PORT = process.env.PORT || 3000;
+    
+    server.listen(PORT, () => {
+        console.log(`🌐 Web server running on port ${PORT}`);
+        
+        // 2. Start the self-pinging loop once the server is up
+        startSelfPing();
+    });
+}
+
+function startSelfPing() {
+    // Render assigns this automatically to your public .onrender.com URL
+    const url = process.env.RENDER_EXTERNAL_URL; 
+
+    if (!url) {
+        console.log("⚠️ No RENDER_EXTERNAL_URL found. Self-pinger will not run.");
+        return;
+    }
+
+    console.log(`⏱️ Starting self-pinger for ${url}`);
+    
+    // Ping the URL every 10 minutes (600,000 milliseconds)
+    setInterval(() => {
+        https.get(url, (res) => {
+            console.log(`♻️ Self-ping successful: Status ${res.statusCode}`);
+        }).on('error', (err) => {
+            console.error(`❌ Self-ping failed: ${err.message}`);
+        });
+    }, 10 * 60 * 1000); 
 }
