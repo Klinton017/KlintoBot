@@ -1,10 +1,10 @@
-const http = require('http');
+import http from 'http';
 
-function keepAlive() {
+export default function keepAlive() {
   const server = http.createServer((req, res) => {
     // When the server is pinged, return a 200 OK status
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write("TitanBot Keep-Alive Server is Online!");
+    res.write("Bot Keep-Alive Server is Online!");
     res.end();
   });
 
@@ -17,5 +17,3 @@ function keepAlive() {
     console.error(`❌ Failed to start keep-alive server. Port might be in use: ${err.message}`);
   });
 }
-
-module.exports = keepAlive;
