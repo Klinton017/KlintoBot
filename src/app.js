@@ -1,4 +1,6 @@
-﻿import 'dotenv/config';
+import startSelfPing from '../keepAlive.js';
+startSelfPing();
+import 'dotenv/config';
 import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { REST } from '@discordjs/rest';
 import express from 'express';
